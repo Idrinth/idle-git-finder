@@ -1,0 +1,39 @@
+#!/usr/bin/env php
+<?php
+
+use Symfony\Component\Finder\Finder;
+use Symfony\Component\Process\Process;
+
+require_once 'vendor/autoload.php';
+
+$processes = [];
+foreach(Finder::create()
+    ->directories()
+    ->ignoreDotFiles(false)
+    ->ignoreVcs(false)
+    ->notPath('/vendor/')
+    ->in(getcwd())
+    ->name('.git') as $file) {
+    $path = $file->getPath();
+    $process = new Process("git status --porcelain", $path);
+    $process->start(function ($type, $data) use ($path) {
+        if ($type !== 'out') {
+            echo "\nX $path (F)";
+            return;
+        }
+        $files = array_filter(explode("\n", $data), function ($file) {
+            return (bool) !preg_match('/^\/vendor\//', $file);
+        });
+        $isEmptyDir = count(array_diff(scandir($path), ['.', '..', '.git'])) === 0;
+        $path = str_replace('\\', '/', preg_replace('/^' . preg_quote(getcwd(), '/') . '/', '', $path)) ?: '/';
+        if (!$isEmptyDir && count($files) > 0) {
+            echo "\nX $path (" . count($files) . ")";
+        } else {
+            echo "\n✓ $path";
+        }
+    });
+    $processes[] = $process;
+}
+foreach ($processes as $process) {
+    $process->wait();
+}

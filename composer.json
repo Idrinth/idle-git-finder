@@ -1,0 +1,16 @@
+{
+    "name": "idrinth/idle-git-finder",
+    "description": "Looks recursively through cwd and displays the status of all git-repositories found.",
+    "keywords": ["git", "status", "recursive"],
+    "authors": [
+        {
+            "name": "Björn Büttner",
+            "homepage": "https://github.com/idrinth"
+        }
+    ],
+    "require": {
+        "symfony/finder": "^4",
+        "symfony/process": "^4"
+    },
+    "bin": ["find-idle-git"]
+}
