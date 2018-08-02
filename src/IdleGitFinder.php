@@ -19,7 +19,7 @@ class IdleGitFinder
     /**
      * @var string[]
      */
-    private static $ignoreFiles = array('.', '..', '.git', '.svn');
+    private static $fileDiffignore = array('.', '..', '.git', '.svn');
 
     /**
      * @param string[] $pathsToIgnore
@@ -27,8 +27,9 @@ class IdleGitFinder
     public function __construct(array $pathsToIgnore = array())
     {
         $this->replacementRegex = '/^' . preg_quote(getcwd(), '/') . '/';
+        $separator = DIRECTORY_SEPARATOR;
         foreach ($pathsToIgnore as $path) {
-            $this->pathsToIgnore[] = '/'.preg_quote(DIRECTORY_SEPARATOR.str_replace('/', DIRECTORY_SEPARATOR, $path), '/').'/';
+            $this->pathsToIgnore[] = '/' . preg_quote($separator . str_replace('/', $separator, $path), '/') . '/';
         }
     }
 
@@ -80,7 +81,7 @@ class IdleGitFinder
 
     /**
      * @param string $directory
-     * @return FilesystemIterator
+     * @return FilesystemIterator|string[]
      */
     private function getSubDirIterator($directory)
     {
@@ -98,16 +99,16 @@ class IdleGitFinder
     {
         $dirs = array();
         foreach ($this->getSubDirIterator($directory) as $file) {
-            if(is_dir($file)) {
+            if (is_dir($file)) {
                 if (preg_match('/\.svn$/', $file)) {
                     return array();
                 }
                 if (preg_match('/\.git$/', $file)) {
-                    $filesCount = count($this->getChangedFiles($directory));
+                    $modified = count($this->getChangedFiles($directory));
                     $this->display(
-                        $filesCount === 0 || count(array_diff(scandir($directory), self::$ignoreFiles)) === 0 ? "✓" : "X",
+                        $this->isDirectoryUnchanged($modified, $directory) ? "✓" : "X",
                         $directory,
-                        $filesCount
+                        $modified
                     );
                     return array();
                 }
@@ -115,6 +116,19 @@ class IdleGitFinder
             }
         }
         return $dirs;
+    }
+
+    /**
+     * @param int $modified
+     * @param string $directory
+     * @return boolean
+     */
+    private function isDirectoryUnchanged($modified, $directory)
+    {
+        if ($modified === 0) {
+            return true;
+        }
+        return count(array_diff(scandir($directory) ?: [], self::$fileDiffignore) ?: []) === 0;
     }
 
     /**
