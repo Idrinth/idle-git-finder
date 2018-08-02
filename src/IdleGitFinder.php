@@ -128,7 +128,7 @@ class IdleGitFinder
         if ($modified === 0) {
             return true;
         }
-        return count(array_diff(scandir($directory) ?: [], self::$fileDiffignore) ?: []) === 0;
+        return count(array_diff(scandir($directory) ?: array(), self::$fileDiffignore)) === 0;
     }
 
     /**
