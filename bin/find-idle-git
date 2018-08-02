@@ -1,0 +1,8 @@
+#!/usr/bin/env php
+<?php
+
+use De\Idrinth\FindIdleGit\IdleGitFinder;
+
+require_once __DIR__.(is_dir(__DIR__.'/../vendor') ? '/..' : '/../..').'/vendor/autoload.php';
+
+IdleGitFinder::create($argv)->run(getcwd());
