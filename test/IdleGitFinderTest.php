@@ -141,7 +141,7 @@ class IdleGitFinderTest extends TestCase
         $finder->expects(self::any())
             ->method('getChangedFiles')
             ->willReturnCallback(function ($dir) {
-                return array_diff(scandir($dir), array('.', '..', '.git'));
+                return array_diff(scandir($dir) ?: array(), array('.', '..', '.git'));
             });
         return $finder;
     }

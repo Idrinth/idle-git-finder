@@ -26,7 +26,7 @@ class IdleGitFinder
      */
     public function __construct(array $pathsToIgnore = array())
     {
-        $this->replacementRegex = '/^' . preg_quote(getcwd(), '/') . '/';
+        $this->replacementRegex = '/^' . preg_quote(getcwd() ?: '/', '/') . '/';
         $separator = DIRECTORY_SEPARATOR;
         foreach ($pathsToIgnore as $path) {
             $this->pathsToIgnore[] = '/' . preg_quote($separator . str_replace('/', $separator, $path), '/') . '/';
@@ -69,6 +69,9 @@ class IdleGitFinder
      */
     public function run($dir)
     {
+        if (!is_string($dir) || !is_dir($dir)) {
+            return;
+        }
         foreach ($this->pathsToIgnore as $regex) {
             if (preg_match($regex, $dir)) {
                 return;
@@ -81,13 +84,13 @@ class IdleGitFinder
 
     /**
      * @param string $directory
-     * @return FilesystemIterator|string[]
+     * @return FilesystemIterator
      */
     private function getSubDirIterator($directory)
     {
         return new FilesystemIterator(
             $directory,
-            FilesystemIterator::SKIP_DOTS|FilesystemIterator::CURRENT_AS_PATHNAME
+            FilesystemIterator::SKIP_DOTS | FilesystemIterator::CURRENT_AS_PATHNAME
         );
     }
 
@@ -99,7 +102,7 @@ class IdleGitFinder
     {
         $dirs = array();
         foreach ($this->getSubDirIterator($directory) as $file) {
-            if (is_dir($file)) {
+            if (is_string($file) && is_dir($file)) {
                 if (preg_match('/\.svn$/', $file)) {
                     return array();
                 }

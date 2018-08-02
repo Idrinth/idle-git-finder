@@ -1,0 +1,3 @@
+includes:
+    - ../tools/vendor/phpstan/phpstan-phpunit/extension.neon
+    - ../tools/vendor/phpstan/phpstan-phpunit/rules.neon
