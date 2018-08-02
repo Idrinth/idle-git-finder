@@ -46,7 +46,7 @@ class IdleGitFinder
      * @param string $path
      * @param int $files
      */
-    private function print($success, $path, $files)
+    private function display($success, $path, $files)
     {
         echo "\n$success {$this->simplifyPath($path)} ($files)";
     }
@@ -104,7 +104,7 @@ class IdleGitFinder
                 }
                 if (preg_match('/\.git$/', $file)) {
                     $filesCount = count($this->getChangedFiles($directory));
-                    $this->print(
+                    $this->display(
                         $filesCount === 0 || count(array_diff(scandir($directory), self::$ignoreFiles)) === 0 ? "✓" : "X",
                         $directory,
                         $filesCount
