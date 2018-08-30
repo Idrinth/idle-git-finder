@@ -1,5 +1,6 @@
 {
     "name": "idrinth/idle-git-finder",
+    "license": "MIT",
     "description": "Looks recursively through cwd and displays the status of all git-repositories found.",
     "keywords": ["git", "status", "recursive"],
     "authors": [
